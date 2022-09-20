@@ -28,7 +28,6 @@ from pyicloud.services import (
 )
 from pyicloud.utils import get_password_from_keyring
 
-
 LOGGER = logging.getLogger(__name__)
 
 HEADER_DATA = {
@@ -97,16 +96,16 @@ class PyiCloudSession(Session):
         LOGGER.debug("Cookies saved to %s", self.service.cookiejar_path)
 
         if not response.ok and (
-            content_type not in json_mimetypes
-            or response.status_code in [421, 450, 500]
+                content_type not in json_mimetypes
+                or response.status_code in [421, 450, 500]
         ):
             try:
                 # pylint: disable=protected-access
                 fmip_url = self.service._get_webservice_url("findme")
                 if (
-                    has_retried is None
-                    and response.status_code in [421, 450, 500]
-                    and fmip_url in url
+                        has_retried is None
+                        and response.status_code in [421, 450, 500]
+                        and fmip_url in url
                 ):
                     # Handle re-authentication for Find My iPhone
                     LOGGER.debug("Re-authenticating Find My iPhone service")
@@ -163,8 +162,8 @@ class PyiCloudSession(Session):
 
     def _raise_error(self, code, reason):
         if (
-            self.service.requires_2sa
-            and reason == "Missing X-APPLE-WEBAUTH-TOKEN cookie"
+                self.service.requires_2sa
+                and reason == "Missing X-APPLE-WEBAUTH-TOKEN cookie"
         ):
             raise PyiCloud2SARequiredException(self.service.user["apple_id"])
         if code in ("ZONE_NOT_FOUND", "AUTHENTICATION_FAILED"):
@@ -178,8 +177,8 @@ class PyiCloudSession(Session):
             raise (api_error)
         if code == "ACCESS_DENIED":
             reason = (
-                reason + ".  Please wait a few minutes then try again."
-                "The remote servers might be trying to throttle requests."
+                    reason + ".  Please wait a few minutes then try again."
+                             "The remote servers might be trying to throttle requests."
             )
         if code in [421, 450, 500]:
             reason = "Authentication required for Account."
@@ -205,13 +204,13 @@ class PyiCloudService:
     SETUP_ENDPOINT = "https://setup.icloud.com/setup/ws/1"
 
     def __init__(
-        self,
-        apple_id,
-        password=None,
-        cookie_directory=None,
-        verify=True,
-        client_id=None,
-        with_family=True,
+            self,
+            apple_id,
+            password=None,
+            cookie_directory=None,
+            verify=True,
+            client_id=None,
+            with_family=True,
     ):
         if password is None:
             password = get_password_from_keyring(apple_id)
@@ -285,6 +284,14 @@ class PyiCloudService:
             LOGGER.debug("Checking session token validity")
             try:
                 self.data = self._validate_token()
+
+                # Add dsid to params
+                ds_info = self.data.get('dsInfo')
+                if ds_info:
+                    dsid = ds_info.get('dsid')
+                    if dsid:
+                        self.params.update({'dsid': dsid})
+
                 login_successful = True
             except PyiCloudAPIResponseException:
                 LOGGER.debug("Invalid authentication token, will log in from scratch.")
@@ -423,14 +430,14 @@ class PyiCloudService:
     def requires_2sa(self):
         """Returns True if two-step authentication is required."""
         return self.data.get("dsInfo", {}).get("hsaVersion", 0) >= 1 and (
-            self.data.get("hsaChallengeRequired", False) or not self.is_trusted_session
+                self.data.get("hsaChallengeRequired", False) or not self.is_trusted_session
         )
 
     @property
     def requires_2fa(self):
         """Returns True if two-factor authentication is required."""
         return self.data["dsInfo"].get("hsaVersion", 0) == 2 and (
-            self.data.get("hsaChallengeRequired", False) or not self.is_trusted_session
+                self.data.get("hsaChallengeRequired", False) or not self.is_trusted_session
         )
 
     @property
