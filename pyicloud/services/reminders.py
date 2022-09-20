@@ -58,11 +58,23 @@ class RemindersService:
                 else:
                     due = None
 
+                if reminder.get('priority'):
+                    prio = reminder.get('priority')
+                else:
+                    prio = 0
+
+                if reminder.get('description'):
+                    desc = reminder.get('description')
+                else:
+                    desc = ''
+
                 temp.append(
                     {
                         "title": reminder.get("title"),
-                        "desc": reminder.get("description"),
+                        "desc": desc,
                         "due": due,
+                        "guid": reminder.get('guid'),
+                        "priority": prio
                     }
                 )
             self.lists[collection.get("title")] = temp
