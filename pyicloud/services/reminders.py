@@ -36,36 +36,36 @@ class RemindersService:
 
         self.lists = {}
         self.collections = {}
-        for collection in data["Collections"]:
+        for collection in data.get("Collections"):
             temp = []
-            self.collections[collection["title"]] = {
-                "guid": collection["guid"],
-                "ctag": collection["ctag"],
+            self.collections[collection.get("title")] = {
+                "guid": collection.get("guid"),
+                "ctag": collection.get("ctag"),
             }
-            for reminder in data["Reminders"]:
+            for reminder in data.get("Reminders"):
 
-                if reminder["pGuid"] != collection["guid"]:
+                if reminder.get("pGuid") != collection.get("guid"):
                     continue
 
                 if reminder.get("dueDate"):
                     due = datetime(
-                        reminder["dueDate"][1],
-                        reminder["dueDate"][2],
-                        reminder["dueDate"][3],
-                        reminder["dueDate"][4],
-                        reminder["dueDate"][5],
+                        reminder.get("dueDate")[1],
+                        reminder.get("dueDate")[2],
+                        reminder.get("dueDate")[3],
+                        reminder.get("dueDate")[4],
+                        reminder.get("dueDate")[5],
                     )
                 else:
                     due = None
 
                 temp.append(
                     {
-                        "title": reminder["title"],
+                        "title": reminder.get("title"),
                         "desc": reminder.get("description"),
                         "due": due,
                     }
                 )
-            self.lists[collection["title"]] = temp
+            self.lists[collection.get("title")] = temp
 
     def post(self, title, description="", collection=None, due_date=None):
         """Adds a new reminder."""
