@@ -4,8 +4,6 @@ import time
 import uuid
 import json
 
-from tzlocal import get_localzone_name
-
 
 class RemindersService:
     """The 'Reminders' iCloud service."""
@@ -24,7 +22,7 @@ class RemindersService:
         """Refresh data."""
         params_reminders = dict(self._params)
         params_reminders.update(
-            {"clientVersion": "4.0", "lang": "en-us", "usertz": get_localzone_name()}
+            {"clientVersion": "4.0", "lang": "en-us", "usertz": 'UTC'}
         )
 
         # Open reminders
@@ -79,7 +77,7 @@ class RemindersService:
                 )
             self.lists[collection.get("title")] = temp
 
-    def post(self, title, description="", collection=None, due_date=None):
+    def post(self, time_zone, title, description="", collection=None, due_date=None):
         """Adds a new reminder."""
         pguid = "tasks"
         if collection:
@@ -88,7 +86,7 @@ class RemindersService:
 
         params_reminders = dict(self._params)
         params_reminders.update(
-            {"clientVersion": "4.0", "lang": "en-us", "usertz": get_localzone_name()}
+            {"clientVersion": "4.0", "lang": "en-us", "usertz": time_zone}
         )
 
         due_dates = None
