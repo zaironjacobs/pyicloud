@@ -286,11 +286,7 @@ class PyiCloudService:
                 self.data = self._validate_token()
 
                 # Add dsid to params
-                ds_info = self.data.get('dsInfo')
-                if ds_info:
-                    dsid = ds_info.get('dsid')
-                    if dsid:
-                        self.params.update({'dsid': dsid})
+                self.params.update({'dsid': self.session.service.data["dsInfo"]["dsid"]})
 
                 login_successful = True
             except PyiCloudAPIResponseException:
